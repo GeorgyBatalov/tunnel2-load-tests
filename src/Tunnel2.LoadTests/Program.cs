@@ -1,5 +1,7 @@
 using NBomber.CSharp;
-using NBomber.Http.CSharp;
+using NBomber.Contracts;
+using Tunnel2.LoadTests.Config;
+using Tunnel2.LoadTests.Scenarios;
 
 namespace Tunnel2.LoadTests;
 
@@ -14,31 +16,150 @@ internal static class Program
         Console.WriteLine("Tunnel2 Load Tests Runner");
         Console.WriteLine("========================");
         Console.WriteLine();
-        Console.WriteLine("NOTE: This is a minimal setup. See LOAD_TESTING_ROADMAP.md for full implementation plan.");
+
+        // Parse command line arguments
+        var config = ParseArguments(args);
+
+        Console.WriteLine($"Configuration:");
+        Console.WriteLine($"  Tunnel URL: {config.TunnelUrl}");
+        Console.WriteLine($"  Backend URL: {config.BackendUrl}");
+        Console.WriteLine($"  Reports Path: {config.ReportsPath}");
         Console.WriteLine();
 
-        // Example basic HTTP scenario
-        // This is a placeholder - real scenarios will be implemented according to roadmap Phase 1.2
-        var httpClient = new HttpClient();
+        // Determine which scenario to run
+        var scenarioName = GetScenarioName(args);
 
-        var scenario = Scenario.Create("basic_http_scenario", async context =>
+        switch (scenarioName.ToLower())
         {
-            var request = Http.CreateRequest("GET", "http://localhost:8080/get")
-                .WithHeader("Accept", "application/json");
+            case "baseline":
+            case "basic":
+                RunBasicHttpScenario(config);
+                break;
 
-            var response = await Http.Send(httpClient, request);
+            case "post-1kb":
+                RunPostScenario(config, "1KB");
+                break;
 
-            return response;
-        })
-        .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-        .WithLoadSimulations(
-            Simulation.Inject(rate: 10, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromMinutes(1))
-        );
+            case "post-10kb":
+                RunPostScenario(config, "10KB");
+                break;
+
+            case "post-100kb":
+                RunPostScenario(config, "100KB");
+                break;
+
+            case "post-all":
+                RunPostAllScenarios(config);
+                break;
+
+            default:
+                Console.WriteLine($"Running default scenario: BasicHttp");
+                RunBasicHttpScenario(config);
+                break;
+        }
+    }
+
+    private static void RunBasicHttpScenario(ScenarioConfig config)
+    {
+        Console.WriteLine("Running BasicHttpScenario (Phase 1.2)");
+        Console.WriteLine("Warm-up: 10 seconds");
+        Console.WriteLine("Load: 10 RPS for 2 minutes");
+        Console.WriteLine();
+
+        var scenario = BasicHttpScenario.Create(config.TunnelUrl);
 
         NBomberRunner
             .RegisterScenarios(scenario)
+            .WithReportFolder(config.ReportsPath)
             .Run();
 
-        httpClient.Dispose();
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static void RunPostScenario(ScenarioConfig config, string bodySize)
+    {
+        Console.WriteLine($"Running PostWithBodyScenario (Phase 1.4) - {bodySize}");
+        Console.WriteLine("Warm-up: 10 seconds");
+        Console.WriteLine("Load: 10 RPS for 2 minutes");
+        Console.WriteLine();
+
+        ScenarioProps scenario = bodySize switch
+        {
+            "1KB" => PostWithBodyScenario.Create1KB(config.TunnelUrl),
+            "10KB" => PostWithBodyScenario.Create10KB(config.TunnelUrl),
+            "100KB" => PostWithBodyScenario.Create100KB(config.TunnelUrl),
+            _ => throw new ArgumentException($"Invalid body size: {bodySize}")
+        };
+
+        NBomberRunner
+            .RegisterScenarios(scenario)
+            .WithReportFolder(config.ReportsPath)
+            .Run();
+
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static void RunPostAllScenarios(ScenarioConfig config)
+    {
+        Console.WriteLine("Running All POST scenarios (Phase 1.4)");
+        Console.WriteLine("Scenarios: 1KB, 10KB, 100KB (concurrent)");
+        Console.WriteLine("Warm-up: 10 seconds each");
+        Console.WriteLine("Load: 10 RPS for 2 minutes each");
+        Console.WriteLine();
+
+        var scenarios = PostWithBodyScenario.CreateAllSizes(config.TunnelUrl);
+
+        NBomberRunner
+            .RegisterScenarios(scenarios)
+            .WithReportFolder(config.ReportsPath)
+            .Run();
+
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static ScenarioConfig ParseArguments(string[] args)
+    {
+        var config = new ScenarioConfig();
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] == "--tunnel-url" && i + 1 < args.Length)
+            {
+                config.TunnelUrl = args[i + 1];
+                i++;
+            }
+            else if (args[i] == "--backend-url" && i + 1 < args.Length)
+            {
+                config.BackendUrl = args[i + 1];
+                i++;
+            }
+            else if (args[i] == "--reports-path" && i + 1 < args.Length)
+            {
+                config.ReportsPath = args[i + 1];
+                i++;
+            }
+            else if (args[i] == "--verbose")
+            {
+                config.VerboseLogging = true;
+            }
+        }
+
+        return config;
+    }
+
+    private static string GetScenarioName(string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] == "--scenario" && i + 1 < args.Length)
+            {
+                return args[i + 1];
+            }
+        }
+
+        return "basic";
     }
 }

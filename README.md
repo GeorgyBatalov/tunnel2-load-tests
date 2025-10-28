@@ -49,29 +49,59 @@ cd xtunnel
 docker compose -f tunnel2-deploy/docker-compose-localhost.yml up -d
 ```
 
-### 2. Run Load Tests
+### 2. Start Tunnel Client
+
+Start the tunnel client with a fixed dev SessionId:
 
 ```bash
-cd tunnel2-load-tests/src/Tunnel2.LoadTests
-dotnet run -c Release
+cd tunnel2-client/src/Tunnel.ClientApp
+dotnet run -- \
+  --dev-session-id=a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d \
+  --backend-host=localhost \
+  --backend-port=8080 \
+  --tunnel-host=localhost \
+  --tunnel-port=12002
 ```
 
-### 3. View Reports
+### 3. Run Baseline Test
 
-Reports are generated in the `reports/` directory (HTML format).
+```bash
+cd tunnel2-load-tests
+./scripts/run-baseline.sh
+```
+
+### 4. Run POST Body Tests
+
+```bash
+# Run all POST scenarios (1KB, 10KB, 100KB)
+./scripts/run-post-body.sh all
+
+# Or run specific body size
+./scripts/run-post-body.sh 10kb
+```
+
+### 5. View Reports
+
+Reports are generated in the `reports/` directory (HTML, TXT, MD formats).
 
 ## Current Status
 
-🚧 **Phase 0: Project Setup** - COMPLETED
-- ✅ Project structure created
-- ✅ NBomber packages installed
-- ✅ Directory layout established
-- ⏳ Basic scenario implementation (in progress)
+✅ **Phase 1: Foundation** - COMPLETED
+- ✅ Project structure created (Phase 1.1)
+- ✅ BasicHttpScenario implemented (Phase 1.2)
+- ✅ run-baseline.sh script created (Phase 1.2)
+- ✅ BASELINE_METRICS.md template created (Phase 1.3)
+- ✅ PostWithBodyScenario implemented (Phase 1.4)
+- ✅ run-post-body.sh script created (Phase 1.4)
+- ✅ GitHub Actions workflow added
+
+**Ready for Phase 2:** Stress & Capacity Testing
 
 **Next Steps:**
-- Implement BasicHttpScenario (Phase 1.2)
-- Collect baseline metrics (Phase 1.3)
-- Create run scripts
+- Run baseline tests and collect metrics
+- Implement RampUpScenario (Phase 2.1)
+- Implement StressScenario (Phase 2.2)
+- Test large file transfers (Phase 2.3)
 
 ## Technology Stack
 
