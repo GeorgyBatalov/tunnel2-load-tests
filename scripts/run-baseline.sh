@@ -6,6 +6,7 @@
 # Prerequisites:
 # - Docker stack running: docker compose -f tunnel2-deploy/docker-compose-localhost.yml up -d
 # - Tunnel client running with SessionId: a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+# - Backend (httpbin) running on port 12005
 #
 # Usage:
 #   ./run-baseline.sh [tunnel-url]

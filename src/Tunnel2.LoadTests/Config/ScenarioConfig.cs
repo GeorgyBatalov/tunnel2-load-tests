@@ -15,8 +15,9 @@ public class ScenarioConfig
     /// <summary>
     /// Test backend URL (direct connection, bypassing tunnel)
     /// Used for comparison tests
+    /// Port 12005 is httpbin running in Docker
     /// </summary>
-    public string BackendUrl { get; set; } = "http://localhost:8080";
+    public string BackendUrl { get; set; } = "http://localhost:12005";
 
     /// <summary>
     /// Reports output directory

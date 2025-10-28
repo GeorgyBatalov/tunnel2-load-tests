@@ -58,10 +58,12 @@ cd tunnel2-client/src/Tunnel.ClientApp
 dotnet run -- \
   --dev-session-id=a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d \
   --backend-host=localhost \
-  --backend-port=8080 \
+  --backend-port=12005 \
   --tunnel-host=localhost \
   --tunnel-port=12002
 ```
+
+**Note:** Backend port 12005 is httpbin running in Docker.
 
 ### 3. Run Baseline Test
 
