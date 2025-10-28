@@ -16,7 +16,7 @@
 #
 # Example:
 #   ./run-post-body.sh 10kb
-#   ./run-post-body.sh all http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000
+#   ./run-post-body.sh all http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
 
 set -e
 
@@ -26,7 +26,7 @@ REPORTS_DIR="$SCRIPT_DIR/../reports"
 
 # Parse arguments
 BODY_SIZE="${1:-all}"
-TUNNEL_URL="${2:-http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000}"
+TUNNEL_URL="${2:-http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d}"
 
 echo "========================================"
 echo "Tunnel2 POST Body Load Test"

@@ -11,7 +11,7 @@
 #   ./run-baseline.sh [tunnel-url]
 #
 # Example:
-#   ./run-baseline.sh http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000
+#   ./run-baseline.sh http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
 
 set -e
 
@@ -19,8 +19,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$SCRIPT_DIR/../src/Tunnel2.LoadTests"
 REPORTS_DIR="$SCRIPT_DIR/../reports"
 
-# Default tunnel URL (uses fixed dev SessionId)
-TUNNEL_URL="${1:-http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000}"
+# Default tunnel URL (localhost path mapping with fixed dev SessionId)
+TUNNEL_URL="${1:-http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d}"
 
 echo "========================================"
 echo "Tunnel2 Baseline Load Test"

@@ -6,10 +6,11 @@ namespace Tunnel2.LoadTests.Config;
 public class ScenarioConfig
 {
     /// <summary>
-    /// Tunnel URL (e.g., http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000)
+    /// Tunnel URL for localhost (path mapping: http://localhost:12000/sessionId)
+    /// Example: http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
     /// Can be overridden via command line argument
     /// </summary>
-    public string TunnelUrl { get; set; } = "http://a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d-e1.tunnel.local:12000";
+    public string TunnelUrl { get; set; } = "http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d";
 
     /// <summary>
     /// Test backend URL (direct connection, bypassing tunnel)
