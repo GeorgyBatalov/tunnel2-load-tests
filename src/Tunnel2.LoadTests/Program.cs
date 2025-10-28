@@ -52,6 +52,21 @@ internal static class Program
                 RunPostAllScenarios(config);
                 break;
 
+            case "ramp-up":
+            case "rampup":
+                RunRampUpScenario(config, "standard");
+                break;
+
+            case "ramp-up-fast":
+            case "rampup-fast":
+                RunRampUpScenario(config, "fast");
+                break;
+
+            case "ramp-up-aggressive":
+            case "rampup-aggressive":
+                RunRampUpScenario(config, "aggressive");
+                break;
+
             default:
                 Console.WriteLine($"Running default scenario: BasicHttp");
                 RunBasicHttpScenario(config);
@@ -113,6 +128,51 @@ internal static class Program
 
         NBomberRunner
             .RegisterScenarios(scenarios)
+            .WithReportFolder(config.ReportsPath)
+            .Run();
+
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static void RunRampUpScenario(ScenarioConfig config, string variant)
+    {
+        Console.WriteLine($"Running Ramp-Up Stress Test (Phase 2.1) - {variant}");
+        Console.WriteLine();
+
+        ScenarioProps scenario = variant.ToLower() switch
+        {
+            "fast" => RampUpScenario.CreateFast(config.TunnelUrl),
+            "aggressive" => RampUpScenario.CreateAggressive(config.TunnelUrl),
+            "standard" => RampUpScenario.CreateStandard(config.TunnelUrl),
+            _ => RampUpScenario.CreateFast(config.TunnelUrl)
+        };
+
+        if (variant.ToLower() == "fast")
+        {
+            Console.WriteLine("Load stages: 10 → 50 → 100 → 200 → 500 RPS");
+            Console.WriteLine("Stage duration: 1 minute each");
+            Console.WriteLine("Total duration: ~5 minutes");
+        }
+        else if (variant.ToLower() == "aggressive")
+        {
+            Console.WriteLine("Load stages: 20 → 50 → 100 → 200 → 500 → 1000 RPS");
+            Console.WriteLine("Stage duration: 30 seconds each");
+            Console.WriteLine("Total duration: ~3 minutes");
+        }
+        else
+        {
+            Console.WriteLine("Load stages: 10 → 50 → 100 → 200 → 500 RPS");
+            Console.WriteLine("Stage duration: 5 minutes each");
+            Console.WriteLine("Total duration: ~25 minutes");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Goal: Find performance limits and degradation points");
+        Console.WriteLine();
+
+        NBomberRunner
+            .RegisterScenarios(scenario)
             .WithReportFolder(config.ReportsPath)
             .Run();
 

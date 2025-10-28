@@ -5,14 +5,14 @@
 #
 # Prerequisites:
 # - Docker stack running: docker compose -f tunnel2-deploy/docker-compose-localhost.yml up -d
-# - Tunnel client running with SessionId: a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+# - Tunnel client running with SessionId: 22222222-2222-2222-2222-222222222222
 # - Backend (httpbin) running on port 12005
 #
 # Usage:
 #   ./run-baseline.sh [tunnel-url]
 #
 # Example:
-#   ./run-baseline.sh http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+#   ./run-baseline.sh http://localhost:12000/session/22222222-2222-2222-2222-222222222222
 
 set -e
 
@@ -21,7 +21,7 @@ PROJECT_DIR="$SCRIPT_DIR/../src/Tunnel2.LoadTests"
 REPORTS_DIR="$SCRIPT_DIR/../reports"
 
 # Default tunnel URL (localhost path mapping with fixed dev SessionId)
-TUNNEL_URL="${1:-http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d}"
+TUNNEL_URL="${1:-http://localhost:12000/session/22222222-2222-2222-2222-222222222222}"
 
 echo "========================================"
 echo "Tunnel2 Baseline Load Test"
@@ -43,7 +43,7 @@ else
     echo ""
     echo "Make sure:"
     echo "  1. Docker stack is running: docker compose -f tunnel2-deploy/docker-compose-localhost.yml up -d"
-    echo "  2. Tunnel client is running with SessionId: a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+    echo "  2. Tunnel client is running with SessionId: 22222222-2222-2222-2222-222222222222"
     echo ""
     exit 1
 fi

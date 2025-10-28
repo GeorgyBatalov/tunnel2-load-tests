@@ -26,7 +26,16 @@ public static class BasicHttpScenario
     /// <returns>NBomber scenario</returns>
     public static NBomber.Contracts.ScenarioProps Create(string tunnelUrl)
     {
-        var httpClient = new HttpClient();
+        // Configure connection pool for better performance
+        var handler = new SocketsHttpHandler
+        {
+            MaxConnectionsPerServer = 500,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(1),
+            EnableMultipleHttp2Connections = true
+        };
+
+        var httpClient = new HttpClient(handler);
 
         var scenario = Scenario.Create("basic_http_get", async context =>
         {
@@ -65,7 +74,16 @@ public static class BasicHttpScenario
         int rps,
         int durationMinutes)
     {
-        var httpClient = new HttpClient();
+        // Configure connection pool for better performance
+        var handler = new SocketsHttpHandler
+        {
+            MaxConnectionsPerServer = 500,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(1),
+            EnableMultipleHttp2Connections = true
+        };
+
+        var httpClient = new HttpClient(handler);
 
         var scenario = Scenario.Create("basic_http_get", async context =>
         {

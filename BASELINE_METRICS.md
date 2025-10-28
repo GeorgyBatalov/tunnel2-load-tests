@@ -37,50 +37,62 @@
 
 ## Baseline Run History
 
-### Run #1: [Date TBD]
+### Run #1: 2025-10-28 14:19 (Session e1719182)
 
 **Environment:**
 - CPU: Apple M1 Pro, 10 cores
 - RAM: 32GB
-- Docker: Settings TBD
+- Docker: Default settings
 - Network: localhost
 - OS: macOS 15.6 (Darwin 24.6.0)
 
 **Test Configuration:**
 - Scenario: BasicHttpScenario
-- Endpoint: /get (httpbin через tunnel)
+- SessionId: 22222222-2222-2222-2222-222222222222
+- Tunnel URL: http://localhost:12000/session/22222222-2222-2222-2222-222222222222
+- Backend: httpbin on port 12005
+- Endpoint: /get
 - Warm-up: 10 seconds
 - Load: 10 RPS for 2 minutes
-- Total requests: ~1200
+- Total requests: 1200
 
 **Results:**
 ```
 Latency:
-  - P50: TBD ms
-  - P75: TBD ms
-  - P95: TBD ms
-  - P99: TBD ms
-  - Mean: TBD ms
-  - StdDev: TBD ms
+  - P50: 18.05 ms
+  - P75: 48.83 ms
+  - P95: 64.00 ms
+  - P99: 74.69 ms
+  - Mean: 27.25 ms
+  - Min: 3.21 ms
+  - Max: 87.88 ms
+  - StdDev: 21.14 ms
 
 Throughput:
-  - Actual RPS: TBD req/sec
+  - Actual RPS: 10 req/sec
   - Target RPS: 10 req/sec
+  - Data transferred: 0.536 MB total
 
 Errors:
-  - Error rate: TBD%
-  - Total errors: TBD
-  - Error types: TBD
+  - Error rate: 0%
+  - Total errors: 0
+  - Success rate: 100% (1200/1200)
+  - Status codes: 200 OK (100%)
 
-Resource Usage (Tunnel components):
-  - Tunnel Server CPU: TBD%
-  - Tunnel Server Memory: TBD MB
-  - Proxy Entry CPU: TBD%
-  - Proxy Entry Memory: TBD MB
+Resource Usage (NBomber Process):
+  - CPU usage: 0.65%
+  - Memory working set: 104.29 MB
+  - GC heap size: 8.05 MB
+  - Threadpool threads: 6
+  - DNS lookups: 1200 requests, ~0.5-0.7ms duration
 ```
 
 **Notes:**
-- [Add any observations, anomalies, or special conditions]
+- Perfect stability, zero errors over 2-minute test
+- Very low resource utilization (<1% CPU) suggests significant headroom
+- Consistent latency with reasonable StdDev (21.14ms)
+- P99 under 75ms is excellent for tunneled traffic
+- System ready for higher load testing
 
 ---
 

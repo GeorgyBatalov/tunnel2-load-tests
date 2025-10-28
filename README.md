@@ -65,14 +65,32 @@ dotnet run -- \
 
 **Note:** Backend port 12005 is httpbin running in Docker.
 
-### 3. Run Baseline Test
+### 3. Smoke Test - Verify Backend and Tunnel
+
+**IMPORTANT:** Always run smoke tests before load tests!
+
+**Test backend directly:**
+```bash
+curl http://localhost:12005/get
+```
+Expected: JSON response from httpbin
+
+**Test tunnel with session:**
+```bash
+curl http://localhost:12000/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d/get
+```
+Expected: Same JSON response routed through tunnel
+
+If either fails, fix the issue before proceeding with load tests.
+
+### 4. Run Baseline Test
 
 ```bash
 cd tunnel2-load-tests
 ./scripts/run-baseline.sh
 ```
 
-### 4. Run POST Body Tests
+### 5. Run POST Body Tests
 
 ```bash
 # Run all POST scenarios (1KB, 10KB, 100KB)
@@ -82,7 +100,7 @@ cd tunnel2-load-tests
 ./scripts/run-post-body.sh 10kb
 ```
 
-### 5. View Reports
+### 6. View Reports
 
 Reports are generated in the `reports/` directory (HTML, TXT, MD formats).
 
