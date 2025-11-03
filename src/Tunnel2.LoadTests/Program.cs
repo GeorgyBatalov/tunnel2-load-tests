@@ -67,6 +67,30 @@ internal static class Program
                 RunRampUpScenario(config, "aggressive");
                 break;
 
+            case "max-throughput":
+            case "maxthroughput":
+                RunMaxThroughputScenario(config, "standard");
+                break;
+
+            case "max-throughput-ultra":
+            case "maxthroughput-ultra":
+                RunMaxThroughputScenario(config, "ultra");
+                break;
+
+            case "sustained-load":
+            case "sustained":
+                RunSustainedLoadScenario(config, "standard");
+                break;
+
+            case "sustained-load-quick":
+            case "sustained-quick":
+                RunSustainedLoadScenario(config, "quick");
+                break;
+
+            case "baseline-check":
+                RunSustainedLoadScenario(config, "baseline");
+                break;
+
             default:
                 Console.WriteLine($"Running default scenario: BasicHttp");
                 RunBasicHttpScenario(config);
@@ -169,6 +193,92 @@ internal static class Program
 
         Console.WriteLine();
         Console.WriteLine("Goal: Find performance limits and degradation points");
+        Console.WriteLine();
+
+        NBomberRunner
+            .RegisterScenarios(scenario)
+            .WithReportFolder(config.ReportsPath)
+            .Run();
+
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static void RunMaxThroughputScenario(ScenarioConfig config, string variant)
+    {
+        Console.WriteLine($"Running Max Throughput Test - {variant}");
+        Console.WriteLine();
+
+        ScenarioProps scenario = variant.ToLower() switch
+        {
+            "ultra" => MaxThroughputScenario.CreateUltraAggressive(config.TunnelUrl),
+            "standard" => MaxThroughputScenario.Create(config.TunnelUrl),
+            _ => MaxThroughputScenario.Create(config.TunnelUrl)
+        };
+
+        if (variant.ToLower() == "ultra")
+        {
+            Console.WriteLine("Load stages: 1k → 5k → 10k → 20k → 50k → 100k RPS");
+            Console.WriteLine("Stage duration: 20 seconds each");
+            Console.WriteLine("Total duration: ~2 minutes");
+            Console.WriteLine("WARNING: Extreme test! Will push system to absolute limits.");
+        }
+        else
+        {
+            Console.WriteLine("Load stages: 500 → 750 → 1000 → 1500 → 2000 → 3000 RPS");
+            Console.WriteLine("Stage duration: 1 minute each");
+            Console.WriteLine("Total duration: ~6 minutes");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Goal: Find maximum sustainable RPS (breaking point)");
+        Console.WriteLine("Success criteria: <1% error rate");
+        Console.WriteLine();
+
+        NBomberRunner
+            .RegisterScenarios(scenario)
+            .WithReportFolder(config.ReportsPath)
+            .Run();
+
+        Console.WriteLine();
+        Console.WriteLine($"Reports saved to: {config.ReportsPath}");
+    }
+
+    private static void RunSustainedLoadScenario(ScenarioConfig config, string variant)
+    {
+        Console.WriteLine($"Running Sustained Load Test - {variant}");
+        Console.WriteLine();
+
+        ScenarioProps scenario = variant.ToLower() switch
+        {
+            "quick" => SustainedLoadScenario.CreateQuick(config.TunnelUrl),
+            "baseline" => SustainedLoadScenario.CreateBaselineCheck(config.TunnelUrl),
+            "standard" => SustainedLoadScenario.Create(config.TunnelUrl),
+            _ => SustainedLoadScenario.Create(config.TunnelUrl)
+        };
+
+        if (variant.ToLower() == "quick")
+        {
+            Console.WriteLine("Load stages: 100 → 300 → 500 → 700 RPS");
+            Console.WriteLine("Stage duration: 30 seconds each");
+            Console.WriteLine("Total duration: ~2 minutes");
+        }
+        else if (variant.ToLower() == "baseline")
+        {
+            Console.WriteLine("Fixed load: 400 RPS for 2 minutes");
+            Console.WriteLine("Success criteria: 0 errors, p99 < 3s, avg < 1s");
+            Console.WriteLine("Purpose: CI/CD regression baseline check");
+        }
+        else
+        {
+            Console.WriteLine("Load stages: 100 → 200 → 300 → 400 → 500 → 600 → 700 → 800 RPS");
+            Console.WriteLine("Stage duration: 1 minute each");
+            Console.WriteLine("Total duration: ~8 minutes");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Goal: Find error-free RPS threshold without cooldown");
+        Console.WriteLine("Note: No cooldown between stages (simulates continuous traffic)");
         Console.WriteLine();
 
         NBomberRunner
